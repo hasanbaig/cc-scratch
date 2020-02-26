@@ -1,5 +1,5 @@
 import urllib
-import urllib2
+#import urllib3
 
 from django.conf import settings
 from django.template.loader import render_to_string

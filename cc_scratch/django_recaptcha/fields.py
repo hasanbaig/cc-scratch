@@ -3,7 +3,7 @@ import sys
 
 from django import forms
 from django.conf import settings
-from django.utils.encoding import smart_unicode
+from django.utils.encoding import smart_text
 from django.utils.translation import ugettext_lazy as _
 
 from cc_scratch.django_recaptcha import client

@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerE
 from django.views.generic import TemplateView, RedirectView, View, FormView
 from django.views.generic.edit import FormMixin, ProcessFormView
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
@@ -176,7 +176,7 @@ class KeysAddView(RestrictedFormView):
             #Run a test API call
             ec2_connection.get_all_regions()
             
-        except Exception, e:
+        except Exception as e:
             #Since we are about to return form_invalid, add the errors directly to the form non field error list
             #kwargs['errors']=aws_tools.process_errors([e])
             key.delete()
@@ -189,7 +189,7 @@ class KeysAddView(RestrictedFormView):
             
             vpc = vpc_tools.create_vpc(key, vpc_connection, ec2_connection)
 
-        except Exception, e:
+        except Exception as e:
             log.exception(e)
             try:
                 vpc.delete()
@@ -435,7 +435,7 @@ class KeysDeleteView(MyAccountView):
                         if errors != []:
                             log.exception(errors)
                             request.session['errors'] = aws_tools.process_errors(errors)
-                except Exception, e:
+                except Exception as e:
                     log.exception(e)
                 #And delete the key
                 key.delete()
@@ -458,7 +458,7 @@ class VPCConfigView(MyAccountView):
         try:
             key = AWSAccessKey.objects.get(id=key_id)
             assert key.user == request.user
-        except Exception, e:
+        except Exception as e:
             request.session['errors'] = [e]
             return HttpResponseRedirect(reverse_lazy('my_account_keys'))
         kwargs['key'] = key

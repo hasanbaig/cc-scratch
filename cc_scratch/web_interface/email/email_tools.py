@@ -11,7 +11,7 @@
 # Django settings for cc_scratch project.
 
 from django.core.mail import send_mail
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from cc_scratch import settings
 from cc_scratch.web_interface.models import EC2Pool, Task
 from logging import getLogger
