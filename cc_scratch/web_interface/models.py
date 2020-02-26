@@ -8,22 +8,21 @@
 #-------------------------------------------------------------------------------
 from django.db import models
 from django.contrib.auth.models import User
-
 # Create your models here.
 from django.core.validators import RegexValidator, MinValueValidator
-from cloud_copasi.web_interface.aws import aws_tools, ec2_config
+from cc_scratch.web_interface.aws import aws_tools, ec2_config
 from boto.vpc import VPCConnection
 from boto.ec2 import EC2Connection
 import sys, os, random, string
-from cloud_copasi import copasi
-import cPickle
+from cc_scratch import copasi
+import pickle
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import fields
-from cloud_copasi.web_interface.fields import UUIDField
+from cc_scratch.web_interface.fields import UUIDField
 import json
 import datetime
 import shutil
-from cloud_copasi.web_interface.task_plugins import tools
+from cc_scratch.web_interface.task_plugins import tools
 
 import logging
 
@@ -49,7 +48,7 @@ POOL_TYPE_CHOICES = (
 class Profile(models.Model):
     """Stores additional profile information for a user
     """
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete = models.CASCADE)
     institution = models.CharField(max_length=50)
     
     task_emails = models.BooleanField(default=True)
@@ -62,7 +61,7 @@ class Profile(models.Model):
 class AWSAccessKey(models.Model):
     """Represents an AWS access key
     """
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     
     name = models.CharField(max_length=100, help_text='For your convenience, assign a unique name to this access key', verbose_name='Key name')
 
@@ -70,7 +69,7 @@ class AWSAccessKey(models.Model):
     
     secret_key = models.CharField(max_length=40, help_text='The 40-character secret access key associated with the access key ID', verbose_name='Secret access key', validators=[RegexValidator(regex='^.{40}$', message='Length has to be 40', code='nomatch')])
     
-    copy_of = models.ForeignKey('self', null=True, blank=True, verbose_name = 'Is this key a shared version of an original key?')
+    copy_of = models.ForeignKey('self', null=True, blank=True, verbose_name = 'Is this key a shared version of an original key?', on_delete = models.CASCADE)
     
     use_for_spotprice_history = models.BooleanField(default=False, verbose_name='Use this key for getting spot price history for other users')
     def __unicode__(self):
@@ -83,7 +82,7 @@ class AWSAccessKey(models.Model):
 class VPC(models.Model):
     """Represents an AWS VPC in which we can run jobs
     """
-    access_key = models.OneToOneField(AWSAccessKey, null=True)
+    access_key = models.OneToOneField(AWSAccessKey, null=True, on_delete = models.CASCADE)
     #The VPC in which everything else resides
     vpc_id = models.CharField(max_length=20, verbose_name='VPC ID')
     
@@ -140,7 +139,7 @@ class VPC(models.Model):
             vpc_connection.close()
             ec2_connection.close()
             return vpc_state
-        except Exception, e:
+        except Exception as e:
             return 'error: ' + str(e)
     def get_keypair(self, ec2_connection):
         """
@@ -161,11 +160,11 @@ class CondorPool(models.Model):
     
     name = models.CharField(max_length=100, verbose_name='Pool name', help_text='Choose a name for this pool')
 
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
     
     uuid=UUIDField(auto=True, null=True, blank=True)
     
-    copy_of = models.ForeignKey('self', blank=True, null=True, help_text = 'Is this pool a copy of an existing pool belonging to another user?')
+    copy_of = models.ForeignKey('self', blank=True, null=True, help_text = 'Is this pool a copy of an existing pool belonging to another user?', on_delete = models.CASCADE)
     
     platform = models.CharField(max_length = 4,
                                 verbose_name ='The platform of the remote condor submitter we are connecting to',
@@ -234,11 +233,11 @@ class BoscoPool(CondorPool):
 class EC2Pool(CondorPool):
     """Stores info about all the EC2 instances  making up a condor pool#
     """
-    vpc = models.ForeignKey(VPC, verbose_name='Keypair')
-    master=models.ForeignKey('EC2Instance', null=True)
+    vpc = models.ForeignKey(VPC, verbose_name='Keypair', on_delete = models.CASCADE)
+    master=models.ForeignKey('EC2Instance', null=True, on_delete = models.CASCADE)
     size=models.PositiveIntegerField(verbose_name='Initial number of nodes', help_text='The number of compute nodes to launch. In addition, a master node will also be launched.')
     
-    key_pair = models.ForeignKey('EC2KeyPair', null=True)
+    key_pair = models.ForeignKey('EC2KeyPair', null=True, on_delete = models.CASCADE)
 
     initial_instance_type = models.CharField(max_length=20, choices=ec2_config.EC2_TYPE_CHOICES, blank=False, default='t1.micro', help_text='The instance type to launch. The price per hour will vary depending on the instance type. For more information on the different instance types see the <a href="">help page</a>.')
 
@@ -274,7 +273,7 @@ class EC2Pool(CondorPool):
         return instances.count()
     
     def get_queue_name(self):
-        return "cloud-copasi-" + str(self.uuid)
+        return "cloud-copasi-" + str(self.uuid) 
     
     def get_alarm_notify_topic(self):
         """Return the name of the SNS topic that has been created for this pool for instance alarm notifications
@@ -292,7 +291,7 @@ class EC2Pool(CondorPool):
     
 class EC2Instance(models.Model):
     
-    ec2_pool = models.ForeignKey(EC2Pool)
+    ec2_pool = models.ForeignKey(EC2Pool, on_delete = models.CASCADE)
     
     instance_type = models.CharField(max_length=20, choices=ec2_config.EC2_TYPE_CHOICES)
     
@@ -368,10 +367,11 @@ class EC2Instance(models.Model):
 
     def has_spot_request(self):
         return SpotRequest.objects.filter(ec2_instance=self).count() > 0
+        
 class SpotRequest(models.Model):
-    ec2_pool = models.ForeignKey(EC2Pool)
+    ec2_pool = models.ForeignKey(EC2Pool, on_delete = models.CASCADE)
     
-    ec2_instance = models.OneToOneField(EC2Instance, null=True,blank=True)
+    ec2_instance = models.OneToOneField(EC2Instance, null=True,blank=True, on_delete = models.CASCADE)
     
     request_id = models.CharField(max_length=20)
 
@@ -388,7 +388,7 @@ class SpotRequest(models.Model):
         app_label = 'web_interface'
     
     def __unicode__(self):
-        return "%s (User: %s)" % (self.request_id, self.ec2_pool.vpc.access_key.user.username)
+        return "%s (User: %s)" % (self.request_id, self.ec2_pool.vpc.access_key.user.username) 
 
 
     
@@ -406,9 +406,9 @@ class EC2KeyPair(models.Model):
 class ElasticIP(models.Model):
     public_ip = models.GenericIPAddressField()
     
-    instance=models.OneToOneField(EC2Instance, null=True)
+    instance=models.OneToOneField(EC2Instance, null=True, on_delete = models.CASCADE)
     
-    vpc = models.ForeignKey(VPC)
+    vpc = models.ForeignKey(VPC, on_delete = models.CASCADE)
     
     allocation_id = models.CharField(max_length=20, verbose_name='The allocation ID for the IP address')
     
@@ -425,8 +425,8 @@ class Task(models.Model):
     """High-level representation of a computing job
     """
 
-    condor_pool = models.ForeignKey(CondorPool, null=True, blank=True)#Allowed to be null now
-    user = models.ForeignKey(User) #Store the user separately so that we can remove the condor pool and still keep the task
+    condor_pool = models.ForeignKey(CondorPool, null=True, blank=True, on_delete = models.CASCADE)#Allowed to be null now
+    user = models.ForeignKey(User, on_delete = models.CASCADE) #Store the user separately so that we can remove the condor pool and still keep the task
     
     def get_condor_pool_name(self):
         if self.condor_pool:
@@ -472,7 +472,7 @@ class Task(models.Model):
             custom_fields = json.loads(custom_fields_str)
             output = custom_fields[field_name]
             return output
-        except Exception, e:
+        except Exception as e:
             return None
     
     status_choices = (
@@ -512,7 +512,7 @@ class Task(models.Model):
             
             if all_finished:
                 #If all subtasks are marked as finished, then mark the task status as also finished
-                self.status = 'finished'
+                self.status = 'finished' 
             if error:
                 #A single error - mark the task as error too
                 self.status = 'error'
@@ -532,7 +532,7 @@ class Task(models.Model):
             return self.job_count
         else:
             count = 0
-            subtasks = Subtask.objects.filter(task=self)
+            subtasks = Subtask.objects.filter(task=self) 
             for subtask in subtasks:
                 count += subtask.get_job_count()
             return count
@@ -558,7 +558,7 @@ class Task(models.Model):
         self.run_time = self.get_run_time()
         self.save()
     
-    def get_run_time_timedelta(self): return datetime.timedelta(days=self.get_run_time())
+    def get_run_time_timedelta(self): return datetime.timedelta(days=self.get_run_time())    
     run_time = models.FloatField(default=-1.0, help_text = 'The run time of associated condor jobs. Only set after the subtask has finished. Use get_run_time() to access.')
 
     
@@ -595,7 +595,7 @@ class Task(models.Model):
             #Run condor_rm with the cluster ID
             try:
                 log.debug('Removing cluster %s from the condor q' % subtask.cluster_id)
-            except Exception, e:
+            except Exception as e:
                 log.exception(e)
             
             jobs = subtask.condorjob_set.all()
@@ -604,7 +604,7 @@ class Task(models.Model):
         self.set_job_count()
         self.set_run_time()
         for subtask in subtasks:
-            subtask.delete()
+            subtask.delete()    
         self.status = 'deleted'
         
         #Remove the task directory
@@ -618,7 +618,7 @@ class Task(models.Model):
     
 class Subtask(models.Model):
     
-    task = models.ForeignKey(Task, null=True)
+    task = models.ForeignKey(Task, null=True, on_delete = models.CASCADE)
     
     index = models.PositiveIntegerField(verbose_name = 'The order in this subtask is to be executed')
     
@@ -645,7 +645,7 @@ class Subtask(models.Model):
                       )
     status = models.CharField(max_length=32, choices = status_choices, default='waiting')
     
-    cluster_id = models.IntegerField(blank=True, null=True) #The condor cluster ID (i.e. $(Cluster))
+    cluster_id = models.IntegerField(blank=True, null=True) #The condor cluster ID (i.e. $(Cluster)) 
     
     spec_file = models.spec_file = models.CharField(max_length=255, blank=True)
     
@@ -668,7 +668,7 @@ class Subtask(models.Model):
             custom_fields = json.loads(custom_fields_str)
             output = custom_fields[field_name]
             return output
-        except Exception, e:
+        except Exception as e:
             return None
 
     def get_job_count(self):
@@ -683,7 +683,7 @@ class Subtask(models.Model):
    
     def set_job_count(self):
         self.job_count = self.get_job_count()
-        self.save()
+        self.save() 
     job_count = models.IntegerField(default=-1, help_text = 'The count of the number of condor jobs. Only set after the subtask has finished. Use get_job_count() instead to find out job count')
     
     
@@ -725,7 +725,7 @@ class Subtask(models.Model):
 class CondorJob(models.Model):
     
     #The parent job
-    subtask = models.ForeignKey(Subtask, null=True)
+    subtask = models.ForeignKey(Subtask, null=True, on_delete = models.CASCADE)
     #The std output file for the job
     std_output_file = models.CharField(max_length=255)
     #The log file for the job
@@ -747,7 +747,7 @@ class CondorJob(models.Model):
     )
     status = models.CharField(max_length=1, choices=QUEUE_CHOICES)
     
-    #The id of the job process in the cluster. Only set once the job has been queued.
+    #The id of the job process in the cluster. Only set once the job has been queued. 
     process_id = models.IntegerField(null=True, blank=True)
     #The amount of computation time in days that the condor job took to finish. Note, this does not include any interrupted runs. Will not be set until the condor job finishes.
     run_time = models.FloatField(null=True)

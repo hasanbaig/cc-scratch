@@ -24,6 +24,10 @@ DATABASES = {
         'PORT': '',                                         # Set to empty string for default. Not used with sqlite3.
     }
 }
+# Database
+# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'u2)mb#y)_@*+=@1am%#z^k3y6k2hvi5uy%jsz0b)+u8wsv62tc'
@@ -105,6 +109,9 @@ USE_TZ=True
 LANGUAGE_CODE = 'en-us'
 
 
+# Internationalization
+# https://docs.djangoproject.com/en/1.11/topics/i18n/
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
@@ -138,6 +145,9 @@ STATIC_ROOT = os.path.join(CLOUD_COPASI_DIR, 'cc_scratch/web_interface/templates
 STATIC_URL = '/static/'
 
 # Additional locations of static files
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
 STATICFILES_DIRS = [
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
@@ -147,13 +157,60 @@ STATICFILES_DIRS = [
 ]
 
 
+# List of finder classes that know how to find static files in
+# various locations.
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+]
 
+MIDDLEWARE = [
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    # Uncomment the next line for simple clickjacking protection:
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
+ROOT_URLCONF = 'cc_scratch.urls'
 
+WSGI_APPLICATION = 'cc_scratch.wsgi.application'
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#TEMPLATE_DIRS = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+#    os.path.join(CLOUD_COPASI_DIR, 'html5up'),
+#    os.path.join(CLOUD_COPASI_DIR, 'cloud_copasi/web_interface/templates'),
+#    os.path.join(CLOUD_COPASI_DIR, 'cloud_copasi/web_interface/task_plugins/plugins'),
 
+#)
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(CLOUD_COPASI_DIR, 'html5up'),
+                 os.path.join(CLOUD_COPASI_DIR, 'cc_scratch/web_interface/templates'),
+                 os.path.join(CLOUD_COPASI_DIR, 'cc_scratch/web_interface/task_plugins/plugins'),],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'string_if_invalid': 'Invalid: "%s"',
+            'debug': DEBUG,
+        },
+    },
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -161,90 +218,95 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'django.contrib.dynamic_scraper',
+    # Uncomment the next line to enable the admin:
+    'django.contrib.admin',
+    # Uncomment the next line to enable admin documentation:
+    'django.contrib.admindocs',
+    'cc_scratch.web_interface',
+    'cc_scratch.django_recaptcha',
+    'django_extensions',
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
 
-ROOT_URLCONF = 'cc_scratch.urls'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/sign_in'
+LOGOUT_URL = '/sign_out'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
+#Log levels: critical, error, warning, info, debug
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
         },
     },
-]
-
-WSGI_APPLICATION = 'cc_scratch.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'file' : {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'cloud-copasi.log'),
+            'maxBytes': 1024*1024*5, # 5 MB
+            'backupCount': 10,
+            'formatter':'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'cloud_copasi': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        }
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
-STATIC_URL = '/static/'
+#AUTH_PASSWORD_VALIDATORS = [
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+#    },
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+#    },
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+#    },
+#    {
+#        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+#    },
+#]
