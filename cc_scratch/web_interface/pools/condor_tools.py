@@ -8,10 +8,10 @@
 #-------------------------------------------------------------------------------
 import subprocess, re, os
 import os.path, time
-from cloud_copasi import settings
+from cc_scratch import settings
 import logging
-from cloud_copasi.web_interface.models import EC2Pool, Subtask, CondorJob
-from cloud_copasi.web_interface.pools import condor_log_tools
+from cc_scratch.web_interface.models import EC2Pool, Subtask, CondorJob
+from cc_scratch.web_interface.pools import condor_log_tools
 import datetime
 from django.utils.timezone import now
 

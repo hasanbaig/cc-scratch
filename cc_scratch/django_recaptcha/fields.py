@@ -6,8 +6,8 @@ from django.conf import settings
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext_lazy as _
 
-from cloud_copasi.django_recaptcha import client
-from cloud_copasi.django_recaptcha.widgets import ReCaptcha
+from cc_scratch.django_recaptcha import client
+from cc_scratch.django_recaptcha.widgets import ReCaptcha
 
 
 class ReCaptchaField(forms.CharField):

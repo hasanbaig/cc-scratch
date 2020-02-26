@@ -8,12 +8,12 @@
 # Contributors:
 #     Edward Kent - initial API and implementation
 #-------------------------------------------------------------------------------
-# Django settings for cloud_copasi project.
+# Django settings for cc_scratch project.
 
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse_lazy
-from cloud_copasi import settings
-from cloud_copasi.web_interface.models import EC2Pool, Task
+from cc_scratch import settings
+from cc_scratch.web_interface.models import EC2Pool, Task
 from logging import getLogger
 
 log = getLogger(__name__)

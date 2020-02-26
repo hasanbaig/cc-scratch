@@ -23,11 +23,11 @@ from django.contrib.auth import logout
 from django import forms
 import sys
 from boto.exception import BotoServerError
-from cloud_copasi.web_interface.models import AWSAccessKey, CondorPool, Task,\
+from cc_scratch.web_interface.models import AWSAccessKey, CondorPool, Task,\
     EC2Instance, ElasticIP
-from cloud_copasi.web_interface.aws import resource_management_tools
+from cc_scratch.web_interface.aws import resource_management_tools
 import logging
-from cloud_copasi import settings
+from cc_scratch import settings
 #Remember - class based views are not thread safe! Don't pass lists, dicts etc as args
 
 log = logging.getLogger(__name__)

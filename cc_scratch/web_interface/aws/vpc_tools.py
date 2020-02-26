@@ -8,7 +8,7 @@
 #-------------------------------------------------------------------------------
 from boto.vpc import VPCConnection
 from boto.ec2 import EC2Connection
-from cloud_copasi.web_interface import models
+from cc_scratch.web_interface import models
 import boto.exception
 import sys, os
 import time
@@ -53,8 +53,8 @@ def create_vpc(key, vpc_connection, ec2_connection):
     #Set up the security groups
     master_sg_name = 'condor_master_' + str(vpc.id)
     worker_sg_name = 'condor_worker_' + str(vpc.id) 
-    master_group = ec2_connection.create_security_group(master_sg_name, 'created_by_cloud_copasi', vpc.id)
-    worker_group = ec2_connection.create_security_group(worker_sg_name, 'created_by_cloud_copasi', vpc.id)
+    master_group = ec2_connection.create_security_group(master_sg_name, 'created_by_cc_scratch', vpc.id)
+    worker_group = ec2_connection.create_security_group(worker_sg_name, 'created_by_cc_scratch', vpc.id)
     time.sleep(5)
     if not ALLOW_ALL_TRAFFIC:
         #Set up the master security group

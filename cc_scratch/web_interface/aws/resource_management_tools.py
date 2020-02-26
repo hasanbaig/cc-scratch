@@ -9,14 +9,14 @@
 from boto.vpc import VPCConnection
 from boto.ec2 import EC2Connection
 from boto.ec2.instance import Instance
-from cloud_copasi.web_interface import models
-from cloud_copasi.web_interface.aws import aws_tools, ec2_config, ec2_tools
-from cloud_copasi.web_interface.models import EC2Instance, VPC, EC2KeyPair, EC2Pool, ElasticIP,\
+from cc_scratch.web_interface import models
+from cc_scratch.web_interface.aws import aws_tools, ec2_config, ec2_tools
+from cc_scratch.web_interface.models import EC2Instance, VPC, EC2KeyPair, EC2Pool, ElasticIP,\
     AWSAccessKey, Task
 import sys, os
 from exceptions import Exception
 from time import sleep
-from cloud_copasi import settings
+from cc_scratch import settings
 from boto import sqs
 import logging
 
