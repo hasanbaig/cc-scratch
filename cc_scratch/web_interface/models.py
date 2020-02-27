@@ -35,6 +35,7 @@ PLATFORM_CHOICES = (
     ('RH6', 'Red Hat 6'),
     ('RH7', 'Red Hat 7'),
     ('UBUNTU12', 'Ubuntu 12'),
+    ('MACOS', 'MAC OS')
 )
 
 POOL_TYPE_CHOICES = (
@@ -166,7 +167,7 @@ class CondorPool(models.Model):
     
     copy_of = models.ForeignKey('self', blank=True, null=True, help_text = 'Is this pool a copy of an existing pool belonging to another user?', on_delete = models.CASCADE)
     
-    platform = models.CharField(max_length = 4,
+    platform = models.CharField(max_length = 8,
                                 verbose_name ='The platform of the remote condor submitter we are connecting to',
                                 choices = PLATFORM_CHOICES,
                                 default = PLATFORM_CHOICES[0][0],

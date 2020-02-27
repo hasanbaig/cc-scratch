@@ -27,7 +27,7 @@ DATABASES = {
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-
+# TODO: Understand this file.
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'u2)mb#y)_@*+=@1am%#z^k3y6k2hvi5uy%jsz0b)+u8wsv62tc'

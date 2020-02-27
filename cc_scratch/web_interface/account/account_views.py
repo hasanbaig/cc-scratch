@@ -508,7 +508,7 @@ class AccountRegisterView(FormView):
     def dispatch(self, request, *args, **kwargs):
         
         #Only display if the user is not logged in
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             return HttpResponseRedirect(reverse_lazy('my_account'))
         
 

@@ -53,7 +53,7 @@ class DefaultView(TemplateView):
         if errors:
             kwargs['errors'] = errors
         
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             if hasattr(self, 'template_name') and self.template_name != 'home.html':
                 #Don't show on the home screen, regardless of logged in or not
                 kwargs['show_status_bar']=True
@@ -153,7 +153,7 @@ class RestrictedFormView(RestrictedView, FormMixin, ProcessFormView):
 
 class LandingView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             return reverse_lazy('my_account')
         else:
             return reverse_lazy('home')
