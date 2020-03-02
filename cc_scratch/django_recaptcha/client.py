@@ -101,7 +101,7 @@ def submit(recaptcha_challenge_field,
     else:
         verify_url = 'http://%s/recaptcha/api/verify' % VERIFY_SERVER
 
-    request = urllib2.Request(
+    request = urllib.request(
         url=verify_url,
         data=params,
         headers={
@@ -110,7 +110,7 @@ def submit(recaptcha_challenge_field,
             }
         )
 
-    httpresp = urllib2.urlopen(request)
+    httpresp = urllib.urlopen(request)
 
     return_values = httpresp.read().splitlines()
     httpresp.close()

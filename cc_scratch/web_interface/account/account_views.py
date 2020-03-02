@@ -481,8 +481,9 @@ class AccountRegisterForm(UserCreationForm):
     terms = forms.BooleanField(required=True, label='Agree to terms and conditions?',
                                help_text = 'You must agree to the terms and conditions in order to register. Click <a href="%s" target="new">here</a> for further details',
                                )    
-    
-    captcha = ReCaptchaField(attrs={'theme': 'clean'}, label='Enter text')
+
+
+   # captcha = ReCaptchaField(attrs={'theme': 'clean'}, label='Enter text')
     
     def __init__(self, *args, **kwargs):
         super(AccountRegisterForm, self).__init__(*args, **kwargs)

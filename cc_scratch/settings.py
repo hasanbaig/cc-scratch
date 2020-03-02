@@ -53,11 +53,18 @@ EMAIL_HOST = 'localhost'
 
 #The site that cloud-copasi will be hosted on
 HOST='subdomain.domain.com'
+#added by HB
+#HOST='localhost'
 
 #Register this subdomain at https://www.google.com/recaptcha/admin/create
 #To enable the registration captcha
-RECAPTCHA_PUBLIC_KEY  = ''
-RECAPTCHA_PRIVATE_KEY = ''
+SILENCED_SYSTEM_CHECKS = ['captcha.recaptcha_test_key_error']
+RECAPTCHA_PUBLIC_KEY  = 'key'
+RECAPTCHA_PRIVATE_KEY = 'secret'
+#Added by HB
+NOCAPTCHA = True
+RECAPTCHA_PROXY = {'http': 'http://127.0.0.1:8000/register', 'https': 'https://127.0.0.1:8000/register'}
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
 #The location of the cloud-copasi user home directory. Include the trailing slash
 #HOME_DIR='/home/cloudcopasi/'
@@ -231,6 +238,7 @@ INSTALLED_APPS = [
     'django.contrib.admindocs',
     'cc_scratch.web_interface',
     'cc_scratch.django_recaptcha',
+    #'captcha',
     'django_extensions',
 ]
 
