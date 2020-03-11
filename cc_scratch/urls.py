@@ -24,6 +24,9 @@ admin.autodiscover()
 
 urlpatterns = [
     # Examples:
+    #following line is added by HB
+    url(r'^', include('django.contrib.auth.urls')),
+    #---------------------------------------------
     url(r'^$', views.LandingView.as_view(), name='landing_view'),
     url(r'^favicon\.ico$', RedirectView.as_view(url='/static/favicon.ico')),
 
@@ -41,7 +44,7 @@ urlpatterns = [
     url(r'^my_account/keys/(?P<key_id>\d+)/unshare/(?P<user_id>\d+)/$', account_views.KeysShareView.as_view(), {'remove':True}, name='my_account_keys_unshare'),
     url(r'^my_account/keys/(?P<key_id>\d+)/rename/$', account_views.KeysRenameView.as_view(), name='my_account_keys_rename'),
 
-    url(r'^my_account/password/reset/$', PasswordResetView,
+    url(r'^my_account/password/reset/$', PasswordResetView.as_view(),
         {'post_reset_redirect' : '/my_account/password/reset/done/',
          'template_name': 'account/password_reset_form.html',
          'extra_context' : {'page_title': 'Reset password'},

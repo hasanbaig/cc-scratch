@@ -40,7 +40,8 @@ ALLOW_NEW_REGISTRATIONS = True
 
 ALLOWED_HOSTS = ['*']
 
-DEFAULT_FROM_EMAIL = 'Cloud-COPASI <noreply@domain.com>'
+DEFAULT_FROM_EMAIL = 'Cloud-COPASI <hbaig@uchc.edu>'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #Send email notifications, e.g. job completion, job errors?
 SEND_EMAILS = True
 #The SMTP Host server.

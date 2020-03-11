@@ -4,6 +4,11 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 3.7 (cc-scratch)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="polls" />
+    <orderEntry type="module" module-name="YTproj" />
+    <orderEntry type="module" module-name="YTproj" />
+    <orderEntry type="module" module-name="YTproj" />
+    <orderEntry type="module" module-name="YTproj" />
   </component>
   <component name="PyDocumentationSettings">
     <option name="format" value="PLAIN" />
